@@ -2,198 +2,163 @@
 
 ---
 
-# Smart UPS Controller (ESP8266)
+# UG56 Smart UPS
 
-Minimalistic controller for managing an external UPS or power source  
-in conditions of limited, unstable, or intermittent energy availability.
-
-Designed for autonomous operation, physical control, and long-term reliability.
+**Spartan ESP8266 UPS controller for keeping essential systems alive under limited power.**
 
 ---
 
-## Purpose
+## Overview
 
-Maintain minimal life-support or infrastructure operation  
-at temporarily unused locations or under limited energy resources.
+Many consumer UPS units, inverters and power stations have significant self-consumption even when the load is minimal.  
+Keeping such devices permanently powered often wastes more energy than the protected equipment itself consumes.
 
-Typical scenarios include:
+This project addresses that problem by **periodic and controlled power management**.
 
-- remote or unattended sites
+Instead of keeping a UPS always on, the controller allows it to be:
 
-- backup-powered equipment
+- powered **only when needed**,
 
-- power-constrained environments
+- switched on and off in **cyclic mode**,
 
-- systems requiring periodic uptime
+- or kept **manually forced on or off**.
 
----
-
-## Key Features
-
-- Three operation modes
-  
-  - MANUAL_OFF — UPS forced off
-  
-  - MANUAL_ON — UPS forced on
-  
-  - CYCLE — periodic on/off cycling
-
-- Physical control
-  
-  - Single button
-    
-    - short press — switch mode
-    
-    - long press — enable OTA update mode
-
-- Cycle timing
-  
-  - Configurable ON / OFF durations
-  
-  - Automatic rescheduling on state change
-
-- Non-blocking logic
-  
-  - No delays
-  
-  - Fully timer-based state machine
-
-- State persistence
-  
-  - Operation mode and settings stored in EEPROM
-  
-  - Deferred writes to reduce flash wear
-
-- OTA (optional, on demand)
-  
-  - Activated only by long button press
-  
-  - Automatically disabled after timeout
-
-- Minimal UI
-  
-  - Single LED with mode-dependent indication
-  
-  - No display, no external dependencies
+This approach makes it possible to support essential systems **much longer** under limited or unstable energy conditions.
 
 ---
 
-## Hardware Overview
+## Design Principles
 
-Controller is designed around ESP8266  
-and interfaces with an external UPS via optocoupler and control line.
+- **External control only**  
+  The controller interacts with the UPS using optocouplers, simulating button presses or control signals.  
+  No internal modification of the UPS, inverter, or power device is required.
 
-Typical connections:
+- **Minimalism and robustness**  
+  The firmware avoids unnecessary complexity and dependencies.  
+  Predictable behavior is prioritized over features.
 
-- MODE button — GPIO0 (INPUT_PULLUP)
+- **Offline-first**  
+  The system remains fully operational without network connectivity.
 
-- MODE LED — GPIO1
-
-- UPS control — GPIO2 (active LOW, via pull-up to +V)
-
-- UPS state — GPIO3 (via optocoupler)
-
-Exact pin usage is centralized in the Board module.
-
----
-
-## Architecture
-
-The project is split into clear responsibility domains:
-
-Board — all GPIO, buttons, LED, hardware timing  
-Ups — UPS logic and mode state machine  
-Ota — OTA activation and lifetime control  
-Settings — EEPROM persistence  
-Web — optional minimal web UI  
-Wifi — connectivity
-
-### Design principles
-
-- All GPIO access is isolated in Board
-
-- Logic modules do not touch pins directly
-
-- Short press and long press are strictly separated
-
-- OTA never runs by default
-
-- Device remains functional even without Wi-Fi
+- **Scalable by design**  
+  When network connectivity is available, the controller can be extended without changing the core logic.
 
 ---
 
-## LED Indication
+## Hardware Concept
 
-MANUAL_OFF — LED off  
-MANUAL_ON — LED on  
-CYCLE — slow blinking (~1 Hz)  
-OTA active — fast blinking (~5 Hz)
+The controller connects to the UPS externally:
 
----
+- one optocoupler to control the UPS power or button input,
 
-## OTA Update Mode
+- one feedback signal to detect the actual UPS state.
 
-OTA is explicitly opt-in.
+This ensures:
 
-- Activated by long button press
+- electrical isolation,
 
-- Runs for a limited time
+- no interference with internal UPS logic,
 
-- Automatically reboots on timeout
+- compatibility with a wide range of devices.
 
-- Normal operation is paused during OTA
-
-This prevents:
-
-- accidental exposure
-
-- unnecessary memory usage
-
-- unintended remote modification
+The reference implementation uses **ESP8266**, but the design is **not tied to any specific microcontroller**.
 
 ---
 
-## Images
+## Operating Modes
 
-Assembled board  
-images/assembled_board.jpg
+The system supports three basic modes:
 
-Wiring / connections  
-images/wiring_diagram.jpg
+- **Manual OFF**  
+  UPS is kept powered off.
 
-Installed device  
-images/installed_device.jpg
+- **Manual ON**  
+  UPS is kept powered on.
 
-(Images will be added after final assembly.)
+- **Cycle**  
+  UPS is periodically switched on and off using configurable intervals.
+
+Mode selection is performed using a **single physical button**.
 
 ---
 
-## Build Environment
+## Local Control
 
-- Arduino IDE or PlatformIO
+- **Short button press**  
+  Cycles through operating modes.
 
-- ESP8266 core
+- **Long button press**  
+  Activates OTA update mode (if supported by the controller).
 
-- No external libraries beyond standard ESP8266 stack
+A status LED provides clear visual feedback:
+
+- steady OFF — Manual OFF mode,
+
+- steady ON — Manual ON mode,
+
+- slow blinking — Cycle mode,
+
+- fast blinking — OTA active.
+
+---
+
+## Network and Expansion
+
+The project is **not network-dependent**, but when a network-capable controller is used, additional functionality becomes available:
+
+- remote monitoring and control,
+
+- configuration via web interface,
+
+- OTA firmware updates.
+
+This allows seamless scaling from a standalone offline device to integration with:
+
+- smart home systems,
+
+- automation servers,
+
+- messaging bots,
+
+- voice assistants.
+
+The core power-management logic remains unchanged.
+
+---
+
+## Persistence
+
+Operating mode and timing parameters are stored in non-volatile memory.  
+Configuration is preserved across reboots and power loss.
+
+Writes are delayed and batched to minimize EEPROM wear.
+
+---
+
+## Intended Use
+
+This project is designed for:
+
+- unattended or rarely visited locations,
+
+- systems operating under limited energy availability,
+
+- environments where simplicity and reliability matter more than features.
 
 ---
 
 ## Status
 
-Project is production-ready for its intended scope.
+The project is actively developed and tested on real hardware.  
+The current implementation focuses on stability and core functionality.
 
-No planned feature expansion beyond:
-
-- minor UI improvements
-
-- optional web-triggered OTA
+Documentation and hardware photos will be added as the project evolves.
 
 ---
 
 ## License
 
-MIT
-
-Use, modify, deploy — without restrictions.
+Open-source.  
+Use, modify, and adapt as needed.
 
 ---
