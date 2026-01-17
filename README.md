@@ -1,164 +1,175 @@
+### UG56 Smart UPS
 
+Minimalist **ESP8266-based controller** for smart power management of UPS, inverters or any device with a power button.
 
----
+The controller is typically installed **inside the target device** and connects directly to:
 
-# UG56 Smart UPS
+- the power button  
+- an ON/OFF feedback signal  
+- the battery voltage  
 
-**Spartan ESP8266 UPS controller for keeping essential systems alive under limited power.**
+UG56 Smart UPS can be **controlled locally** using a single button, or **remotely over Wi-Fi** via a built-in web interface.
 
----
+It supports both **station mode** (connects to existing Wi-Fi) and **access point mode**, where the controller creates its own network for configuration and control.
 
-## Overview
-
-Many consumer UPS units, inverters and power stations have significant self-consumption even when the load is minimal.  
-Keeping such devices permanently powered often wastes more energy than the protected equipment itself consumes.
-
-This project addresses that problem by **periodic and controlled power management**.
-
-Instead of keeping a UPS always on, the controller allows it to be:
-
-- powered **only when needed**,
-
-- switched on and off in **cyclic mode**,
-
-- or kept **manually forced on or off**.
-
-This approach makes it possible to support essential systems **much longer** under limited or unstable energy conditions.
+The device periodically turns power ON and OFF to **extend usable battery runtime during long outages**, while keeping self-consumption low — without modifying firmware or relying on vendor-specific protocols.
 
 ---
 
-## Design Principles
+---
 
-- **External control only**  
-  The controller interacts with the UPS using optocouplers, simulating button presses or control signals.  
-  No internal modification of the UPS, inverter, or power device is required.
+## Visual overview
 
-- **Minimalism and robustness**  
-  The firmware avoids unnecessary complexity and dependencies.  
-  Predictable behavior is prioritized over features.
+### Project cover
 
-- **Offline-first**  
-  The system remains fully operational without network connectivity.
+![UG56 Smart UPS – cover](img/01_cover.jpg)
 
-- **Scalable by design**  
-  When network connectivity is available, the controller can be extended without changing the core logic.
+### Schematic
+
+![UG56 Smart UPS – schematic](img/02_schematic.png)
+
+### Breadboard prototype
+
+![UG56 Smart UPS – breadboard prototype](img/03_breadboard.jpg)
+
+### Soldered version
+
+![UG56 Smart UPS – soldered build](img/04_soldered.jpg)
+
+📂 The **img/** folder contains **many more photos** than shown above, including:
+
+- wiring details  
+- close-ups of critical parts  
+- alternative layouts  
+- prototyping and testing stages  
+
+The images above are just a quick overview, not the full gallery.
 
 ---
 
-## Hardware Concept
+## Why this exists
 
-The controller connects to the UPS externally:
+Most UPS and inverters are designed to stay ON all the time — even when the load doesn’t really need it.  
+During long power outages this wastes energy on self-consumption instead of useful work.
 
-- one optocoupler to control the UPS power or button input,
+UG56 Smart UPS solves this in the **simplest and most universal way**:
+by automating the existing power button logic and adding **timed power cycles**.
 
-- one feedback signal to detect the actual UPS state.
+In practice, you usually **have to open the device**:
 
-This ensures:
+- solder to the power button  
+- connect a feedback line  
+- install the controller inside the case  
+- bring the button, LED and optional switch to the front or rear panel  
 
-- electrical isolation,
+This is still a **logic-level non-invasive approach**:
+no firmware hacks, no reverse engineering, no proprietary protocols — just a controlled, repeatable button press.
 
-- no interference with internal UPS logic,
-
-- compatibility with a wide range of devices.
-
-The reference implementation uses **ESP8266**, but the design is **not tied to any specific microcontroller**.
-
----
-
-## Operating Modes
-
-The system supports three basic modes:
-
-- **Manual OFF**  
-  UPS is kept powered off.
-
-- **Manual ON**  
-  UPS is kept powered on.
-
-- **Cycle**  
-  UPS is periodically switched on and off using configurable intervals.
-
-Mode selection is performed using a **single physical button**.
+Wi-Fi is used for **remote control and configuration**:
+cycle timings, thresholds and modes are set through the web interface,  
+while the controller continues to operate autonomously even without a network.
 
 ---
 
-## Local Control
+## Key features
 
-- **Short button press**  
-  Cycles through operating modes.
-
-- **Long button press**  
-  Activates OTA update mode (if supported by the controller).
-
-A status LED provides clear visual feedback:
-
-- steady OFF — Manual OFF mode,
-
-- steady ON — Manual ON mode,
-
-- slow blinking — Cycle mode,
-
-- fast blinking — OTA active.
+- **Modes**: OFF / ON / Cycle (configurable ON & OFF times)
+- **One-button control**
+  - short press → change mode  
+  - long press → AP / STA switch  
+  - very long press →  OTA request
+- **LED feedback**: mode indication + OTA progress  
+  (using onboard TX LED on ESP-01)
+- **Battery protection**: low-voltage cutoff with hysteresis
+- **Battery % estimation**: separate charge & discharge curves (lead-acid)
+- **Offline-first**: fully functional without Wi-Fi
+- **Web UI (optional)**: monitoring, control, OTA, Wi-Fi setup
+- **Power saving**: Wi-Fi disabled automatically on critically low battery
+- **Persistent settings**: stored in EEPROM
 
 ---
 
-## Network and Expansion
+## Works with **any device that has a power button**, such as:
 
-The project is **not network-dependent**, but when a network-capable controller is used, additional functionality becomes available:
+- UPS / inverter
+- relay-based power modules
+- generator controllers
+- custom power devices
 
-- remote monitoring and control,
+The controller **must know the current device state** (ON/OFF) to operate correctly.  
+This is usually done via a simple feedback line connected to the device's power indicator or logic output.
 
-- configuration via web interface,
+No firmware changes or vendor-specific protocols are required — the controller simply:
 
-- OTA firmware updates.
+- monitors the device state  
+- simulates button presses when needed  
+- applies timed power cycles autonomously
 
-This allows seamless scaling from a standalone offline device to integration with:
+Supports **any ESP8266 module**, including the tiny **ESP-01**.
 
-- smart home systems,
-
-- automation servers,
-
-- messaging bots,
-
-- voice assistants.
-
-The core power-management logic remains unchanged.
-
----
-
-## Persistence
-
-Operating mode and timing parameters are stored in non-volatile memory.  
-Configuration is preserved across reboots and power loss.
-
-Writes are delayed and batched to minimize EEPROM wear.
+Battery voltage sensing on ESP-01 is done via a simple ADC hack:  
+👉 https://github.com/universalgeek56/esp01-adc-hack
 
 ---
 
-## Intended Use
+## Hardware
 
-This project is designed for:
-
-- unattended or rarely visited locations,
-
-- systems operating under limited energy availability,
-
-- environments where simplicity and reliability matter more than features.
+- ESP8266 module (ESP-01, NodeMCU, Wemos D1 Mini, etc.)
+- Voltage divider for battery sensing (typically ~20kΩ / 1kΩ)
+- 2× optocouplers (or transistors):
+  - power button emulation  
+  - device state feedback 
+- Designed for **12V lead-acid UPS / inverters**
 
 ---
 
-## Status
+## Schematic & PCB
 
-The project is actively developed and tested on real hardware.  
-The current implementation focuses on stability and core functionality.
+- EasyEDA project: *(add link here)*
+- Wiring diagrams and photos:  
+  https://github.com/universalgeek56/UG56-Smart-UPS/tree/main/img
 
-Documentation and hardware photos will be added as the project evolves.
+---
+
+## Demo
+
+Live web interface demo (no real hardware required):  
+https://universalgeek56.github.io/UG56-Smart-UPS/
+
+---
+
+## Quick start
+
+```bash
+git clone https://github.com/universalgeek56/UG56-Smart-UPS.git
+```
+
+1. Select your ESP8266 board
+
+2. Build and upload firmware
+
+**First boot behavior**:
+
+- creates AP `Smart_UPS`
+
+- password: `12345678`  
+  (or connects to previously saved Wi-Fi)
+
+**Default cycle mode**:  
+5 minutes ON / 5 minutes OFF  
+(can be changed via button or web UI)
 
 ---
 
 ## License
 
-Open-source.  
-Use, modify, and adapt as needed.
+MIT License  
+See `LICENSE` file for details.
 
 ---
+
+## Related projects
+
+- **ESP-01 ADC Hack**  
+  Reliable analog input on ESP-01  
+  [GitHub - universalgeek56/esp01-adc-hack: Simple ESP-01 hardware hack to expose ESP8266 ADC via RST pin for analog sensors and low-power projects.](https://github.com/universalgeek56/esp01-adc-hack)
