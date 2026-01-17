@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart UPS – Demo</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#111;color:#eee;margin:0;min-height:100vh;display:flex;justify-content:center;}
+.wrap{width:100%;max-width:420px;padding:10px;box-sizing:border-box;}
+h3{text-align:center;margin:10px 0;}
+.block{background:#222;padding:12px;margin-bottom:10px;border-radius:8px;}
+.state{text-align:center;font-size:18px;}
+button{width:100%;padding:12px;margin:4px 0;font-size:16px;border:0;border-radius:8px;background:#333;color:#eee;cursor:pointer;}
+button.active{background:#4caf50;color:#000;}
+button.warn{background:#c62828;}
+input{width:100%;padding:8px;margin:4px 0;border-radius:6px;border:none;background:#333;color:#eee;box-sizing:border-box;}
+.row{display:flex;align-items:center;gap:8px;}
+.ok{color:#4caf50;}
+.low{color:#ffb300;}
+.crit{color:#e53935;font-weight:bold;}
+small{opacity:.7;}
+.footer{display:flex;align-items:center;gap:8px;font-size:12px;color:#888;margin-top:6px;justify-content:center;}
+.footer svg{width:24px;height:24px;color:#4CAF50;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+<h3>UPS Control (Demo)</h3>
+<div class="block state">
+UPS State: <b id="ups">?</b><br>
+UPS Mode: <b id="mode">?</b><br>
+Next Switch: <b id="next">--:--:--</b>
+</div>
+<div class="block state">
+Voltage: <b id="vin">--.-</b> V<br>
+Battery: <b id="bat">--%</b> <b id="dir">?</b><br>
+Status: <b id="pwr">?</b>
+</div>
+<div class="block">
+<button id="on">ON</button>
+<button id="off">OFF</button>
+<button id="cyc">CYCLE</button>
+</div>
+<div class="block">
+<div>ON time (min)</div>
+<div class="row">
+<input type="range" min="1" max="120" id="onRange"><span id="onVal"></span>
+</div>
+<div>OFF time (min)</div>
+<div class="row">
+<input type="range" min="1" max="120" id="offRange"><span id="offVal"></span>
+</div>
+</div>
+<div class="block">
+<button onclick="toggleSettings()">⚙️ Settings</button>
+<div id="settingsPanel" style="display:none;margin-top:10px">
+<input type="text" id="ssid" placeholder="Wi-Fi SSID">
+<input type="password" id="pass" placeholder="Wi-Fi Password">
+<button id="wifiBtn" onclick="saveWifi()">Save Wi-Fi & Reboot</button>
+<small id="wifiInfo">AP SSID: Smart_UPS<br>Pass: 12345678<br>IP AP: 192.168.4.1</small>
+<button id="toggleWifiBtn" onclick="toggleAPMode()">Switch to STA & Reboot</button>
+<button class="warn" onclick="startOTA()">OTA Mode</button>
+</div>
+</div>
+<div class="footer">
+<svg id="logo" viewBox="0 0 24 24" aria-label="Logo" role="img">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)">
+    <line x1="12" y1="4" x2="12" y2="10.5" class="line"/>
+    <path d="M16.24 7a7 7 0 1 1-8.48 0" class="circle"/>
+  </g>
+  <style>
+    .line,.circle{
+      stroke: currentColor; stroke-width:2; fill:none; stroke-dasharray:100; stroke-dashoffset:100; opacity:0;
+      animation-timing-function:ease-out; animation-fill-mode:forwards;
+    }
+    .animate .circle{animation: drawFade 4.8s 0s backwards;}
+    .animate .line{animation: drawFade 4s 0.4s backwards;}
+    @keyframes drawFade{
+      0%{stroke-dashoffset:100; opacity:0;}
+      20%{opacity:1;}
+      70%{stroke-dashoffset:0; opacity:0.7;}
+      100%{opacity:0;}
+    }
+  </style>
+</svg>
+<span>UG56 © 2026 MIT License</span>
+</div>
+</div>
+
+<script>
+let userActive = false, releaseT = 0, saveT = 0;
+let ups = {
+  mode: 'OFF',
+  on: false,
+  onMin: 5,
+  offMin: 5,
+  voltage: 12.6,
+  charging: false,
+  next: -1,
+  ssid: 'Smart_UPS',
+  pass: '12345678',
+  protectedFromMode: null,
+  lastSwitch: 0
+};
+const V_LOW  = 12.1;
+const V_CRIT = 11.9;
+const V_UPPER = 12.5;
+const V_MAX  = 14.2;
+
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const hms = s => {
+  if (s < 0) return '--:--:--';
+  let h = Math.floor(s / 3600);
+  let m = Math.floor((s % 3600) / 60);
+  let x = s % 60;
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(x).padStart(2,'0');
+};
+
+const el = id => document.getElementById(id);
+const upsEl   = el('ups');
+const modeEl  = el('mode');
+const nextEl  = el('next');
+const vinEl   = el('vin');
+const batEl   = el('bat');
+const dirEl   = el('dir');
+const pwrEl   = el('pwr');
+const onBtn   = el('on');
+const offBtn  = el('off');
+const cycBtn  = el('cyc');
+const onR     = el('onRange');
+const offR    = el('offRange');
+const onV     = el('onVal');
+const offV    = el('offVal');
+const ssid    = el('ssid');
+const pass    = el('pass');
+const settingsPanel = el('settingsPanel');
+const toggleWifiBtn = el('toggleWifiBtn');
+
+onBtn.onclick   = () => setMode('ON');
+offBtn.onclick  = () => setMode('OFF');
+cycBtn.onclick  = () => setMode('CYCLE');
+
+onR.oninput = () => { ups.onMin = +onR.value; onV.innerText = onR.value; };
+offR.oninput = () => { ups.offMin = +offR.value; offV.innerText = offR.value; };
+
+function toggleSettings() {
+  settingsPanel.style.display = (settingsPanel.style.display === 'block' ? 'none' : 'block');
+}
+function saveWifi() { alert('Saved (demo)'); }
+
+let isAP = true;
+function toggleAPMode() {
+  isAP = !isAP;
+  toggleWifiBtn.innerText = isAP ? 'Switch to STA & Reboot' : 'Switch to AP & Reboot';
+  alert(`Switched to ${isAP ? 'AP' : 'STA'} mode (demo)`);
+}
+toggleWifiBtn.innerText = isAP ? 'Switch to STA & Reboot' : 'Switch to AP & Reboot';
+
+function setMode(m) {
+  ups.mode = m;
+  ups.on = (m !== 'OFF');
+  ups.protectedFromMode = null;
+  ups.lastSwitch = Date.now();
+}
+
+function simulate() {
+  if (ups.voltage < V_CRIT) {
+    if (ups.mode !== 'OFF') {
+      ups.protectedFromMode = ups.mode;
+    }
+    ups.mode = 'OFF';
+    ups.on = false;
+    ups.next = -1;
+  }
+  else if (ups.voltage >= V_UPPER) {
+    if (ups.protectedFromMode) {
+      ups.mode = ups.protectedFromMode;
+      ups.on = (ups.mode === 'ON');
+      ups.protectedFromMode = null;
+      ups.lastSwitch = Date.now();
+    }
+  }
+
+  if (ups.mode !== 'OFF') {
+    ups.voltage -= ups.on ? 0.03 : 0;
+  } else {
+    ups.voltage += 0.05;
+  }
+  ups.voltage = clamp(ups.voltage, 10.8, V_MAX);
+  ups.charging = !ups.on;
+
+  if (ups.mode === 'CYCLE') {
+    const period = (ups.on ? ups.onMin : ups.offMin) * 60000;
+    const elapsed = Date.now() - (ups.lastSwitch || Date.now());
+    ups.next = Math.max(0, Math.floor((period - elapsed) / 1000));
+
+    if (elapsed >= period) {
+      ups.on = !ups.on;
+      ups.lastSwitch = Date.now();
+    }
+  } else {
+    ups.next = -1;
+  }
+}
+
+function updateUI() {
+  upsEl.innerText = ups.on ? 'ON' : 'OFF';
+  modeEl.innerText = ups.mode;
+  nextEl.innerText = hms(ups.next);
+
+  vinEl.innerText = ups.voltage.toFixed(2);
+
+  let perc = Math.round((ups.voltage - 11.6) / (12.8 - 11.6) * 100);
+  perc = Math.min(100, Math.max(0, perc));
+  batEl.innerText = perc + '%';
+
+  dirEl.innerText = ups.charging ? '↑ Charging' : '↓ Discharging';
+
+  const crit = ups.voltage < V_CRIT;
+  const low  = ups.voltage < V_LOW && !crit;
+  pwrEl.className = '';
+  if (crit) {
+    pwrEl.innerText = 'CRITICAL';
+    pwrEl.classList.add('crit');
+  } else if (low) {
+    pwrEl.innerText = 'LOW';
+    pwrEl.classList.add('low');
+  } else {
+    pwrEl.innerText = 'OK';
+    pwrEl.classList.add('ok');
+  }
+
+  onBtn.classList.toggle('active', ups.mode === 'ON');
+  offBtn.classList.toggle('active', ups.mode === 'OFF');
+  cycBtn.classList.toggle('active', ups.mode === 'CYCLE');
+
+  ssid.value = ups.ssid;
+  pass.value = ups.pass;
+}
+
+function startOTA() {
+  document.querySelectorAll('.wrap > .block').forEach(b => b.style.display = 'none');
+  let p = document.createElement('div');
+  p.className = 'block';
+  p.style.textAlign = 'center';
+  p.innerHTML = '<h2>OTA MODE</h2><div>Waiting for firmware</div><div id="t">30</div><small>seconds</small>';
+  document.querySelector('.wrap').appendChild(p);
+
+  let t = 30;
+  let tm = setInterval(() => {
+    t--;
+    document.getElementById('t').innerText = t;
+    if (t <= 0) {
+      clearInterval(tm);
+      p.innerHTML = '<h2>Demo reboot</h2>';
+      setTimeout(() => location.reload(), 2000);
+    }
+  }, 1000);
+}
+
+onR.value = ups.onMin;   onV.innerText = ups.onMin;
+offR.value = ups.offMin; offV.innerText = ups.offMin;
+
+setInterval(() => { simulate(); updateUI(); }, 500);
+updateUI();
+
+(function() {
+  const logo = document.getElementById('logo');
+  if (!logo) return;
+  logo.classList.add('animate');
+  logo.addEventListener('mouseenter', () => {
+    logo.classList.remove('animate');
+    void logo.getBoundingClientRect();
+    setTimeout(() => logo.classList.add('animate'), 20);
+  });
+})();
+</script>
+</body>
+</html>
