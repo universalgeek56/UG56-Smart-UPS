@@ -22,7 +22,7 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 ### Project cover
 
-![UG56 Smart UPS – cover](img/01_cover.jpg)
+![UG56 Smart UPS – cover](img/01_cover.JPG)
 
 ### Schematic
 
