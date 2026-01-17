@@ -30,11 +30,11 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 ### Breadboard prototype
 
-![UG56 Smart UPS – breadboard prototype](img/03_breadboard.jpg)
+![UG56 Smart UPS – breadboard prototype](img/03_breadboard.JPG)
 
 ### Soldered version
 
-![UG56 Smart UPS – soldered build](img/04_soldered.jpg)
+![UG56 Smart UPS – soldered build](img/04_soldered.JPG)
 
 📂 The **img/** folder contains **many more photos** than shown above, including:
 
