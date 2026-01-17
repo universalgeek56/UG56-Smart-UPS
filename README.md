@@ -141,24 +141,21 @@ Battery voltage sensing on ESP-01 is done via a simple ADC hack:
 
 ## Quick start
 
-```bash
-git clone https://github.com/universalgeek56/UG56-Smart-UPS.git
-```
+1. Click **Code → Download ZIP**
+2. Extract the archive
+3. Rename the `src` folder and `main.ino` to the **same name**, for example:
 
-1. Select your ESP8266 board
+   ```
+   Smart_UPS/Smart_UPS.ino
+   ```
 
-2. Build and upload firmware
+   ⚠️ Use **Latin characters only**, no spaces or special symbols
+4. Leave all other files unchanged
+5. Copy the project folder to `Documents/Arduino/`
+6. Open Arduino IDE → select board and port → upload
 
-**First boot behavior**:
+PlatformIO / Git / GitHub Desktop users can clone and build the project as usual.
 
-- creates AP `Smart_UPS`
-
-- password: `12345678`  
-  (or connects to previously saved Wi-Fi)
-
-**Default cycle mode**:  
-5 minutes ON / 5 minutes OFF  
-(can be changed via button or web UI)
 
 ---
 
