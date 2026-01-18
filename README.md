@@ -36,14 +36,9 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 ![UG56 Smart UPS – soldered build](img/04_soldered.JPG)
 
-📂 The **img/** folder contains **many more photos** than shown above, including:
+📂 The **img/** folder contains ** more photos** than shown above.
 
-- wiring details  
-- close-ups of critical parts  
-- alternative layouts  
-- prototyping and testing stages  
 
-The images above are just a quick overview, not the full gallery.
 
 ---
 
@@ -141,20 +136,24 @@ Battery voltage sensing on ESP-01 is done via a simple ADC hack:
 ## Quick start
 
 1. Click **Code → Download ZIP**
-2. Extract the archive
-3. Rename the `src` folder and `main.ino` to the **same name**, for example:
 
+2. Extract the archive
+
+3. Rename the `src` folder and `main.ino` to the **same name**, for example:
+   
    ```
    Smart_UPS/Smart_UPS.ino
    ```
-
+   
    ⚠️ Use **Latin characters only**, no spaces or special symbols
+
 4. Leave all other files unchanged
+
 5. Copy the project folder to `Documents/Arduino/`
+
 6. Open Arduino IDE → select board and port → upload
 
 PlatformIO / Git / GitHub Desktop users can clone and build the project as usual.
-
 
 ---
 
