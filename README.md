@@ -38,8 +38,6 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 📂 The **img/** folder contains ** more photos** than shown above.
 
-
-
 ---
 
 ## Demo
@@ -79,9 +77,8 @@ while the controller continues to operate autonomously even without a network.
 - **One-button control**
   - short press → change mode  
   - long press → AP / STA switch  
-  - very long press →  OTA request
 - **LED feedback**: mode indication + OTA progress  
-  (using onboard TX LED on ESP-01)
+  (using onboard TX LED on ESP-01 or external led)
 - **Battery protection**: low-voltage cutoff with hysteresis
 - **Battery % estimation**: separate charge & discharge curves (lead-acid)
 - **Offline-first**: fully functional without Wi-Fi
