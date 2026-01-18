@@ -16,8 +16,6 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 ---
 
----
-
 ## Visual overview
 
 ### Project cover
@@ -36,7 +34,7 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 ![UG56 Smart UPS – soldered build](img/04_soldered.JPG)
 
-📂 The **img/** folder contains ** more photos** than shown above.
+📂 The **img/** folder contains **more photos** than shown above.
 
 ---
 
@@ -75,10 +73,10 @@ while the controller continues to operate autonomously even without a network.
 
 - **Modes**: OFF / ON / Cycle (configurable ON & OFF times)
 - **One-button control**
-  - short press → change mode  
-  - long press → AP / STA switch  
+  - short press → change mode
+  - long press → switch AP / STA  
 - **LED feedback**: mode indication + OTA progress  
-  (using onboard TX LED on ESP-01 or external led)
+  (using onboard TX LED on ESP-01 or external LED)
 - **Battery protection**: low-voltage cutoff with hysteresis
 - **Battery % estimation**: separate charge & discharge curves (lead-acid)
 - **Offline-first**: fully functional without Wi-Fi
