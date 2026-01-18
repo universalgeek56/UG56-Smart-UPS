@@ -46,6 +46,7 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 The images above are just a quick overview, not the full gallery.
 
 ---
+
 ## Demo
 
 Live web interface demo (no real hardware required):  
@@ -136,8 +137,6 @@ Battery voltage sensing on ESP-01 is done via a simple ADC hack:
   https://github.com/universalgeek56/UG56-Smart-UPS/tree/main/img
 
 ---
-
-
 
 ## Quick start
 
