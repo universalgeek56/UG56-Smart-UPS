@@ -1,0 +1,25 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="./style.css">
+<title>Settings</title>
+</head><body><div class="wrap">
+<h3>Settings</h3>
+<div class="block">
+<input type="text" id="ssid" placeholder="Wi-Fi SSID">
+<input type="password" id="pass" placeholder="Wi-Fi Password">
+<div class="btn-block"><button onclick="saveWifi()">Save Wi-Fi & Reboot</button></div>
+<small>AP: Smart_UPS / 12345678<br>IP: 192.168.4.1</small>
+<div class="btn-block"><button id="toggleWifiBtn" onclick="toggleAPMode()">Toggle AP Mode</button></div>
+</div>
+<div class="btn-block"><button class="warn" onclick="location.href='./ota.html'">OTA Mode</button></div>
+<div class="btn-block"><a href="./index.html"><button>← Back</button></a></div>
+</div>
+<script src="ups-sim.js"></script>
+<script>
+function saveWifi(){fetch(`/setwifi?ssid=${encodeURIComponent(ssid.value)}&pass=${encodeURIComponent(pass.value)}`).then(()=>alert('Saved. Rebooting...'));}
+function toggleAPMode(){fetch('/toggleap').then(()=>alert('Switching mode. Rebooting...'));}
+fetch('/apmode').then(r=>r.text()).then(m=>toggleWifiBtn.innerText=(m==='AP'?'Switch to STA & Reboot':'Switch to AP & Reboot'));
+fetch('/status').then(r=>r.json()).then(s=>{ssid.value=s.ssid||'';pass.value=s.pass||'';});
+</script>
+</body></html>

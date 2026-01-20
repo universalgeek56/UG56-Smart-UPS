@@ -1,0 +1,27 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="./style.css">
+<title>Battery</title>
+</head><body><div class="wrap">
+<h3>Battery Settings</h3>
+<div class="block">
+<div class="label">Battery Low <span id="vLowWarn"></span></div>
+<div class="row"><input type="range" id="vLowRange" min="11.7" max="13" step="0.1"><span id="vLowVal">--</span></div>
+<div class="label" style="margin-top:16px">Battery Critical <span id="vCritWarn"></span></div>
+<div class="row"><input type="range" id="vCritRange" min="9.9" max="12" step="0.1"><span id="vCritVal">--</span></div>
+<div class="label" style="margin-top:16px">Recovery Voltage</div>
+<div class="row"><input type="range" id="vRecRange" min="12" max="13" step="0.1"><span id="vRecVal">--</span></div>
+</div>
+<div class="btn-block"><a href="./index.html"><button>← Back</button></a></div>
+</div>
+<script src="ups-sim.js"></script>
+<script>
+let saveT;
+function debounce(){clearTimeout(saveT);saveT=setTimeout(()=>fetch(`/setadc?vLow=${vLowRange.value}&vCrit=${vCritRange.value}&vRec=${vRecRange.value}`),600);}
+vLowRange.oninput=_=>{vLowVal.textContent=vLowRange.value;vLowWarn.textContent=vLowRange.value<=11.7?'⚠ Off':'';debounce();}
+vCritRange.oninput=_=>{let v=+vCritRange.value,r=+vRecRange.value;if(v>r)vCritRange.value=v=r;vCritVal.textContent=v<=9.9?'off':v.toFixed(1);vCritWarn.textContent=v<11.8?'⚠ Battery degradation!':'';debounce();}
+vRecRange.oninput=_=>{let v=+vRecRange.value,c=+vCritRange.value;if(v<c)vRecRange.value=v=c;vRecVal.textContent=v.toFixed(1);debounce();}
+fetch('/status').then(r=>r.json()).then(s=>{vLowRange.value=s.vLow;vLowVal.textContent=s.vLow.toFixed(1);vCritRange.value=s.vCrit;vCritVal.textContent=s.vCrit.toFixed(1);vRecRange.value=s.vRec;vRecVal.textContent=s.vRec.toFixed(1);});
+</script>
+</body></html>

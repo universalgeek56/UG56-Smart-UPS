@@ -1,0 +1,21 @@
+<!doctype html><html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="./style.css">
+<title>OTA</title>
+</head><body><div class="wrap">
+<div class="block" style="text-align:center">
+<h2>OTA MODE</h2>
+<div>Waiting for firmware</div>
+<div id="t">300</div>
+<small>seconds</small>
+</div>
+</div>
+<script src="ups-sim.js"></script>
+<script>
+fetch('/ota');
+let t=300;
+let tm=setInterval(()=>{t--;document.getElementById('t').innerText=t;if(t<=0){clearInterval(tm);location.reload();}},1000);
+setInterval(()=>{fetch('/status').then(r=>r.ok&&location.replace('./index.html'));},8000);
+</script>
+</body></html>

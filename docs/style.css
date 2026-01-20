@@ -1,0 +1,19 @@
+* {box-sizing: border-box;margin: 0;padding: 0;}
+body {font-family: system-ui, sans-serif;background: #0f0f0f;color: #e0e0e0;min-height: 100vh;padding: 16px 12px;display: flex;justify-content: center;}
+.wrap {width: 100%;max-width: 420px;}
+h3 {text-align: center;margin: 8px 0 24px;font-size: 1.3rem;font-weight: 500;}
+.block {background: #181818;border: 2px solid #5c5c5c;border-radius: 8px;padding: 14px;margin-bottom: 8px;}
+.btn-block {margin-bottom: 8px;}
+.state {text-align: center;font-size: 1.05rem;line-height: 1.6;}
+.state b {color: #fff;font-weight: 600;}
+button {width: 100%;padding: 14px 16px;font-size: 1rem;font-weight: 500;border: 2px solid #5c5c5c;border-radius: 10px;background: #181818;color: #e0e0e0;cursor: pointer;}
+button:active {background: #222;}
+button.active {background: #4caf50;color: #000;border-color: #4caf50;font-weight: 600;}
+button.warn {background: #e53935;border-color: #e53935;color: #fff;}
+input[type="range"] {width: 100%;margin: 10px 0 6px;}
+input[type="text"],input[type="password"] {width: 100%;padding: 12px 14px;margin: 8px 0 6px;border-radius: 8px;border: 2px solid #5c5c5c;background: #1e1e1e;color: #e0e0e0;font-size: 0.95rem;}
+.row {display: flex;align-items: center;margin: 8px 0;}
+.row span {min-width: 36px;text-align: right;font-weight: 500;color: #bbb;}
+.ok {color: #81c784;}.low {color: #ffb74d;}.crit {color: #e53935;font-weight: 700;}
+small {color: #888;font-size: 0.85rem;line-height: 1.4;display: block;margin-top: 10px;}
+.label {margin-bottom: 8px;font-weight: 500;display: block;}
