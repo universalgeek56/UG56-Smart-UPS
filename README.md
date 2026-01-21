@@ -93,6 +93,16 @@ while the controller continues to operate autonomously even without a network.
 - generator controllers
 - custom power devices
 
+This is not limited to IT equipment. The controller can be used with any system that requires periodic operation, such as:
+
+- heating or cooling elements
+- lighting systems
+- humidifiers and dehumidifiers
+- aeration and ventilation
+- mixers, pumps, and agitators
+- other time-based automation tasks
+
+
 The controller **must know the current device state** (ON/OFF) to operate correctly.  
 This is usually done via a simple feedback line connected to the device's power indicator or logic output.
 
@@ -102,10 +112,11 @@ No firmware changes or vendor-specific protocols are required — the controller
 - simulates button presses when needed  
 - applies timed power cycles autonomously
 
-Supports **any ESP8266 module**, including the tiny **ESP-01**.
+Supports **any ESP8266/8285 module**, including the tiny **ESP-01**.  
+ESP-01 requires a small hack to access the ADC (see https://github.com/universalgeek56/esp01-adc-hack),  
+while other boards (ESP-02 to ESP-12) already include an ADC, so no hardware hacks are needed.  
+On some boards, connecting pin 16 (wake-up) to RST allows ultra-low-power deep sleep and timed wake-ups.
 
-Battery voltage sensing on ESP-01 is done via a simple ADC hack:  
-👉 https://github.com/universalgeek56/esp01-adc-hack
 
 ---
 
