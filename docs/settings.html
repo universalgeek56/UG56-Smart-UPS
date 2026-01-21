@@ -16,6 +16,7 @@
 <div class="btn-block"><a href="./index.html"><button>← Back</button></a></div>
 </div>
 <script src="ups-sim.js"></script>
+<script src="footer.js"></script>
 <script>
 function saveWifi(){fetch(`/setwifi?ssid=${encodeURIComponent(ssid.value)}&pass=${encodeURIComponent(pass.value)}`).then(()=>alert('Saved. Rebooting...'));}
 function toggleAPMode(){fetch('/toggleap').then(()=>alert('Switching mode. Rebooting...'));}
