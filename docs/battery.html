@@ -16,12 +16,13 @@
 <div class="btn-block"><a href="./index.html"><button>← Back</button></a></div>
 </div>
 <script src="ups-sim.js"></script>
+<script src="ups-sim.js"></script>
 <script>
 let saveT;
 function debounce(){clearTimeout(saveT);saveT=setTimeout(()=>fetch(`/setadc?vLow=${vLowRange.value}&vCrit=${vCritRange.value}&vRec=${vRecRange.value}`),600);}
-vLowRange.oninput=_=>{vLowVal.textContent=vLowRange.value;vLowWarn.textContent=vLowRange.value<=11.7?'⚠ Off':'';debounce();}
-vCritRange.oninput=_=>{let v=+vCritRange.value,r=+vRecRange.value;if(v>r)vCritRange.value=v=r;vCritVal.textContent=v<=9.9?'off':v.toFixed(1);vCritWarn.textContent=v<11.8?'⚠ Battery degradation!':'';debounce();}
-vRecRange.oninput=_=>{let v=+vRecRange.value,c=+vCritRange.value;if(v<c)vRecRange.value=v=c;vRecVal.textContent=v.toFixed(1);debounce();}
-fetch('/status').then(r=>r.json()).then(s=>{vLowRange.value=s.vLow;vLowVal.textContent=s.vLow.toFixed(1);vCritRange.value=s.vCrit;vCritVal.textContent=s.vCrit.toFixed(1);vRecRange.value=s.vRec;vRecVal.textContent=s.vRec.toFixed(1);});
+vLowRange.oninput=_=>{vLowVal.textContent=vLowRange.value;let isOff=vLowRange.value<=11.7;vLowWarn.textContent=isOff?'⚠ Off':'';vLowWarn.className=isOff?'crit':'';debounce();}
+vCritRange.oninput=_=>{let v=+vCritRange.value,r=+vRecRange.value;if(v>r){vCritRange.value=v=r;}vCritVal.textContent=v<=9.9?'off':v.toFixed(1);let isDeg=v<11.8;vCritWarn.textContent=isDeg?'⚠ Battery degradation!':'';vCritWarn.className=isDeg?'crit':'';debounce();}
+vRecRange.oninput=_=>{let v=+vRecRange.value,c=+vCritRange.value;if(v<c){vRecRange.value=v=c;}vRecVal.textContent=v.toFixed(1);debounce();}
+fetch('/status').then(r=>r.json()).then(s=>{vLowRange.value=s.vLow;vLowVal.textContent=s.vLow.toFixed(1);let isOffLow=s.vLow<=11.7;vLowWarn.textContent=isOffLow?'⚠ Off':'';vLowWarn.className=isOffLow?'crit':'';vCritRange.value=s.vCrit;vCritVal.textContent=s.vCrit.toFixed(1);let isDegCrit=s.vCrit<11.8;vCritWarn.textContent=isDegCrit?'⚠ Battery degradation!':'';vCritWarn.className=isDegCrit?'crit':'';vRecRange.value=s.vRec;vRecVal.textContent=s.vRec.toFixed(1);});
 </script>
 </body></html>
