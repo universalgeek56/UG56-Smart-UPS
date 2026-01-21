@@ -16,7 +16,6 @@
 <div class="btn-block"><a href="./index.html"><button>← Back</button></a></div>
 </div>
 <script src="ups-sim.js"></script>
-<script src="footer.js"></script>
 <script>
 let saveT;
 function debounce(){clearTimeout(saveT);saveT=setTimeout(()=>fetch(`/setadc?vLow=${vLowRange.value}&vCrit=${vCritRange.value}&vRec=${vRecRange.value}`),600);}
