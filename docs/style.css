@@ -1,7 +1,7 @@
 * {box-sizing: border-box;margin: 0;padding: 0;}
-body {font-family: system-ui, sans-serif;background: #0f0f0f;color: #e0e0e0;min-height: 100vh;padding: 16px 12px;display: flex;justify-content: center;}
+body {font-family: system-ui, sans-serif;background: #0f0f0f;color: #e0e0e0;min-height: 100vh;display: flex;justify-content: center;}
 .wrap {width: 100%;max-width: 420px;}
-h3 {text-align: center;margin: 8px 0 24px;font-size: 1.3rem;font-weight: 500;}
+h3 {text-align: center;margin: 6px 0 8px;font-size: 1.3rem;font-weight: 500;}
 .block {background: #181818;border: 2px solid #5c5c5c;border-radius: 8px;padding: 14px;margin-bottom: 8px;}
 .btn-block {margin-bottom: 8px;}
 .state {text-align: center;font-size: 1.05rem;line-height: 1.6;}
