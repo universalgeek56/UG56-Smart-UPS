@@ -133,7 +133,7 @@ On some boards, connecting pin 16 (wake-up) to RST allows ultra-low-power deep s
 
 ## Schematic & PCB
 
-- EasyEDA project: *(add link here)*
+- EasyEDA project: [*([add link here](https://oshwlab.com/ug56/ug56-smart-ups))*]
 - Wiring diagrams and photos:  
   https://github.com/universalgeek56/UG56-Smart-UPS/tree/main/img
 
