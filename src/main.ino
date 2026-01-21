@@ -1,4 +1,3 @@
-#include <ESP8266WiFi.h>
 #include "Board.h"
 #include "Globals.h"
 #include "Wifi.h"
@@ -6,29 +5,31 @@
 #include "Ups.h"
 #include "Settings.h"
 #include "Web.h"
-
+#include "ADC.h"
 
 void setup() {
-  Board::begin();  
-  Wifi::begin();
-  Settings::begin();
-  Ups::begin();
-  Web::begin();
+    Board::begin();
+    Settings::begin();
+    ADC::begin();
+    Wifi::begin();
+    Ups::begin();
+    Web::begin();
+
 }
 
 void loop() {
-  Wifi::update();
-  Board::update();
-  Ota::update();    
+    ADC::update();
+    Wifi::update();
+    Board::update();
+    Ota::update();
 
-  if (Ota::active()) {
-    return;           
-  }
+    if (Ota::active()) return;
 
-  Settings::update();
-  Ups::update();
-  Web::update();
+    Ups::update();
+    Web::update();
 }
+
+
 
 
 

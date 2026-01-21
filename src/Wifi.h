@@ -4,5 +4,6 @@
 namespace Wifi {
     void begin();
     void update();
-    bool connected();
+    void setMode(bool apMode);
+    bool isConnected();
 }

@@ -1,18 +1,15 @@
 #pragma once
-#include <stdint.h>
+#include <Arduino.h>
 
 namespace Board {
+    void begin();
+    void update();
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
-void begin();
-void update();   // кнопка + LED
-
-// ===== UPS (ЖЕЛЕЗО) =====
-bool upsIsOn();          // чтение состояния
-bool upsButtonBusy();   // кнопка сейчас нажата?
-void upsPressButton();  // неблокирующее нажатие
-
+    bool readUpsState();
+    void upsPressButton();
+    bool upsButtonBusy();
 }
+
 
 
 

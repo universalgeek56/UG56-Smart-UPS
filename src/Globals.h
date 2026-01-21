@@ -1,33 +1,18 @@
 #pragma once
 #include <Arduino.h>
+#include "Ups.h"
 
-/* ========= DEVICE ========= */
-extern String deviceName;
+/* DEVICE */
+extern char deviceName[16];
 
-/* ========= WIFI ========= */
+/* WIFI */
 extern bool wifiEnabled;
 extern bool wifiConnected;
 
-extern char wifiSSID[33];   // 32 + '\0'
-extern char wifiPass[65];   // 64 + '\0'
+extern char wifiApSSID[32];
+extern char wifiApPass[16];
 
-/* ========= OTA ========= */
-extern bool otaActive;
-extern String otaHostname;
-extern uint32_t otaTimeout_ms;
-extern uint32_t otaStartedAt;
+static constexpr uint32_t STARTUP_HOLD_MS = 10000;
 
-/* ========= UPS ========= */
-enum class UpsMode : uint8_t {
-    MANUAL_OFF = 0,
-    MANUAL_ON  = 1,
-    CYCLE      = 2
-};
 
-extern UpsMode upsMode;
-extern bool upsIsOn;
 
-/* ========= CYCLE ========= */
-extern uint32_t cycleOn_ms;
-extern uint32_t cycleOff_ms;
-extern uint32_t cycleNextSwitchAt;
