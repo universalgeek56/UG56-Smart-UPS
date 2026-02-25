@@ -34,6 +34,10 @@ The device periodically turns power ON and OFF to **extend usable battery runtim
 
 ![UG56 Smart UPS – soldered build](img/04_soldered.JPG)
 
+### PCB Designing
+
+![UG56 Smart UPS – soldered build](img/3D_PCB1_1_2026-02-25.png)
+
 📂 The **img/** folder contains **more photos** than shown above.
 
 ---
