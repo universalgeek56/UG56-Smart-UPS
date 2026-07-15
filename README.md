@@ -1,5 +1,8 @@
 ### UG56 Smart UPS
 
+**Video demo:**  
+https://youtu.be/DOxj0pyXuew
+
 Minimalist **ESP8266-based controller** for smart power management of UPS, inverters or any device with a power button.
 
 The controller is typically installed **inside the target device** and connects directly to:
